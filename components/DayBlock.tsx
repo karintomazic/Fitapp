@@ -1,5 +1,7 @@
 import type { MealType } from "@/db/schema";
+import { round1 } from "@/lib/nutrition";
 import { MacroTag } from "./MacroTag";
+import { PeriodSummary } from "./PeriodSummary";
 
 type Entry = {
   id: number;
@@ -20,14 +22,18 @@ const MEAL_TITLES: Record<MealType, string> = {
 
 export function DayBlock({
   date,
+  burned,
+  hasEnergyData,
   entries,
   open,
 }: {
   date: string;
+  burned: number;
+  hasEnergyData: boolean;
   entries: Entry[];
   open?: boolean;
 }) {
-  const totals = entries.reduce(
+  const rawTotals = entries.reduce(
     (acc, e) => ({
       kcal: acc.kcal + e.kcal,
       carbs: acc.carbs + e.carbs,
@@ -36,26 +42,28 @@ export function DayBlock({
     }),
     { kcal: 0, carbs: 0, protein: 0, fat: 0 },
   );
+  const consumed = rawTotals.kcal;
+  const carbs = round1(rawTotals.carbs);
+  const protein = round1(rawTotals.protein);
+  const fat = round1(rawTotals.fat);
 
   return (
     <details
       open={open}
       className="rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900"
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none flex-col gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
         <span className="text-sm font-semibold whitespace-nowrap">{date}</span>
-        {entries.length > 0 ? (
-          <div className="flex flex-wrap items-center justify-end gap-1.5">
-            <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold tabular-nums text-stone-600 dark:bg-stone-800 dark:text-stone-300">
-              {totals.kcal} kcal
-            </span>
-            <MacroTag kind="carbs" value={totals.carbs} />
-            <MacroTag kind="protein" value={totals.protein} />
-            <MacroTag kind="fat" value={totals.fat} />
-          </div>
-        ) : (
-          <span className="text-xs text-stone-400">No entries</span>
-        )}
+        <PeriodSummary
+          burned={burned}
+          consumed={consumed}
+          deficit={burned - consumed}
+          carbs={carbs}
+          protein={protein}
+          fat={fat}
+          hasEnergyData={hasEnergyData}
+          hasFoodData={entries.length > 0}
+        />
       </summary>
 
       {entries.length > 0 && (

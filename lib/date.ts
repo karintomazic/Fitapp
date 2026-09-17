@@ -7,6 +7,12 @@ const dateFormatter = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
 });
 
+const monthFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: TIME_ZONE,
+  year: "numeric",
+  month: "long",
+});
+
 // YYYY-MM-DD in the local Slovenian date, regardless of server timezone.
 export function todayLjubljana(): string {
   return dateFormatter.format(new Date());
@@ -20,4 +26,21 @@ export function lastNDatesLjubljana(n: number): string[] {
     dates.push(dateFormatter.format(new Date(now - i * 24 * 60 * 60 * 1000)));
   }
   return dates;
+}
+
+// YYYY-MM-01 for the current Ljubljana-local month.
+export function currentMonthStartLjubljana(): string {
+  return `${todayLjubljana().slice(0, 7)}-01`;
+}
+
+// Every calendar date (Ljubljana-local) from the start of this month
+// through today, oldest first.
+export function datesInCurrentMonthLjubljana(): string[] {
+  const dayOfMonth = Number(todayLjubljana().slice(8, 10));
+  return lastNDatesLjubljana(dayOfMonth);
+}
+
+// "September 2026" for a "YYYY-MM" key.
+export function monthLabel(monthKey: string): string {
+  return monthFormatter.format(new Date(`${monthKey}-15T12:00:00Z`));
 }

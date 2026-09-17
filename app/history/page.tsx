@@ -1,37 +1,55 @@
-import { asc, gte, sql } from "drizzle-orm";
+import { asc, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyEnergy, foodLog } from "@/db/schema";
-import { lastNDatesLjubljana } from "@/lib/date";
+import {
+  currentMonthStartLjubljana,
+  datesInCurrentMonthLjubljana,
+  monthLabel,
+} from "@/lib/date";
+import { round1 } from "@/lib/nutrition";
 import { Nav } from "@/components/Nav";
 import { DayBlock } from "@/components/DayBlock";
+import { MonthBlock } from "@/components/MonthBlock";
 
 export const dynamic = "force-dynamic";
 
-const DAYS = 30;
-
 export default async function History() {
-  const dates = lastNDatesLjubljana(DAYS); // oldest first
-  const since = dates[0];
+  const monthStart = currentMonthStartLjubljana();
+  const dates = datesInCurrentMonthLjubljana(); // oldest first, this month only
 
-  const [energyRows, consumedRows, logRows] = await Promise.all([
-    db.select().from(dailyEnergy).where(gte(dailyEnergy.date, since)),
-    db
-      .select({
-        date: foodLog.date,
-        consumed: sql<number>`sum(${foodLog.kcal})`.mapWith(Number),
-      })
-      .from(foodLog)
-      .where(gte(foodLog.date, since))
-      .groupBy(foodLog.date),
-    db
-      .select()
-      .from(foodLog)
-      .where(gte(foodLog.date, since))
-      .orderBy(asc(foodLog.loggedAt)),
-  ]);
+  const [energyRows, logRows, priorEnergyMonths, priorFoodMonths] =
+    await Promise.all([
+      db.select().from(dailyEnergy).where(gte(dailyEnergy.date, monthStart)),
+      db
+        .select()
+        .from(foodLog)
+        .where(gte(foodLog.date, monthStart))
+        .orderBy(asc(foodLog.loggedAt)),
+      db
+        .select({
+          month: sql<string>`to_char(${dailyEnergy.date}, 'YYYY-MM')`,
+          activeKcal: sql<number>`sum(${dailyEnergy.activeKcal})`.mapWith(Number),
+          basalKcal: sql<number>`sum(${dailyEnergy.basalKcal})`.mapWith(Number),
+        })
+        .from(dailyEnergy)
+        .where(lt(dailyEnergy.date, monthStart))
+        .groupBy(sql`to_char(${dailyEnergy.date}, 'YYYY-MM')`)
+        .orderBy(sql`to_char(${dailyEnergy.date}, 'YYYY-MM')`),
+      db
+        .select({
+          month: sql<string>`to_char(${foodLog.date}, 'YYYY-MM')`,
+          kcal: sql<number>`sum(${foodLog.kcal})`.mapWith(Number),
+          carbs: sql<number>`sum(${foodLog.carbs})`.mapWith(Number),
+          protein: sql<number>`sum(${foodLog.protein})`.mapWith(Number),
+          fat: sql<number>`sum(${foodLog.fat})`.mapWith(Number),
+        })
+        .from(foodLog)
+        .where(lt(foodLog.date, monthStart))
+        .groupBy(sql`to_char(${foodLog.date}, 'YYYY-MM')`)
+        .orderBy(sql`to_char(${foodLog.date}, 'YYYY-MM')`),
+    ]);
 
   const energyByDate = new Map(energyRows.map((r) => [r.date, r]));
-  const consumedByDate = new Map(consumedRows.map((r) => [r.date, r.consumed]));
 
   const logsByDate = new Map<string, typeof logRows>();
   for (const row of logRows) {
@@ -43,92 +61,82 @@ export default async function History() {
     }
   }
 
-  const rows = dates.reduce<
-    Array<{
-      date: string;
-      burned: number;
-      consumed: number;
-      deficit: number;
-      runningTotal: number;
-      hasData: boolean;
-    }>
-  >((acc, date) => {
-    const energy = energyByDate.get(date);
+  const energyByMonth = new Map(priorEnergyMonths.map((m) => [m.month, m]));
+  const foodByMonth = new Map(priorFoodMonths.map((m) => [m.month, m]));
+  const monthKeys = [
+    ...new Set([...energyByMonth.keys(), ...foodByMonth.keys()]),
+  ].sort();
+
+  const monthRows = monthKeys.map((month) => {
+    const energy = energyByMonth.get(month);
+    const food = foodByMonth.get(month);
     const burned = (energy?.activeKcal ?? 0) + (energy?.basalKcal ?? 0);
-    const consumed = consumedByDate.get(date) ?? 0;
-    const deficit = burned - consumed;
-    const runningTotal = (acc.at(-1)?.runningTotal ?? 0) + deficit;
-    return [
-      ...acc,
-      { date, burned, consumed, deficit, runningTotal, hasData: Boolean(energy) },
-    ];
-  }, []);
-  rows.reverse(); // newest first for display
+    const consumed = food?.kcal ?? 0;
+    return {
+      month,
+      label: monthLabel(month),
+      burned,
+      consumed,
+      deficit: burned - consumed,
+      carbs: round1(food?.carbs ?? 0),
+      protein: round1(food?.protein ?? 0),
+      fat: round1(food?.fat ?? 0),
+      hasFoodData: Boolean(food),
+    };
+  });
+
+  const dayRows = dates.map((date) => {
+    const energy = energyByDate.get(date);
+    return {
+      date,
+      burned: (energy?.activeKcal ?? 0) + (energy?.basalKcal ?? 0),
+      hasData: Boolean(energy),
+    };
+  });
+
+  const displayDayRows = [...dayRows].reverse(); // newest first
+  const displayMonthRows = [...monthRows].reverse(); // newest first
 
   return (
     <div className="flex flex-1 flex-col max-w-2xl w-full mx-auto p-6 gap-6">
       <Nav current="history" />
-      <p className="flex items-center gap-2 text-sm text-stone-500">
-        Last {DAYS} days · Running total
-        <span className="rounded-full bg-stone-900 px-2.5 py-1 text-xs font-semibold tabular-nums text-white dark:bg-stone-100 dark:text-stone-900">
-          {rows[0]?.runningTotal ?? 0}
-        </span>
-      </p>
-
-      <div className="overflow-x-auto rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-stone-100 text-left text-xs tracking-wide text-stone-400 uppercase dark:border-stone-800">
-              <th className="px-4 py-3 font-medium">Date</th>
-              <th className="px-3 py-3 text-right font-medium">Burned</th>
-              <th className="px-3 py-3 text-right font-medium">Eaten</th>
-              <th className="px-3 py-3 text-right font-medium">Deficit</th>
-              <th className="px-4 py-3 text-right font-medium">Running</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr
-                key={r.date}
-                className="border-b border-stone-100 last:border-0 dark:border-stone-800"
-              >
-                <td className="px-4 py-2.5 whitespace-nowrap">
-                  {r.date}
-                  {!r.hasData && (
-                    <span className="ml-1.5 rounded-full bg-stone-100 px-2 py-0.5 text-[11px] text-stone-400 dark:bg-stone-800">
-                      no sync
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2.5 text-right tabular-nums text-stone-500">
-                  {r.burned}
-                </td>
-                <td className="px-3 py-2.5 text-right tabular-nums text-stone-500">
-                  {r.consumed}
-                </td>
-                <td className="px-3 py-2.5 text-right font-semibold tabular-nums">
-                  {r.deficit}
-                </td>
-                <td className="px-4 py-2.5 text-right tabular-nums text-stone-400">
-                  {r.runningTotal}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-sm font-semibold text-stone-500">Food by day</h2>
-        {rows.map((r, i) => (
-          <DayBlock
-            key={r.date}
-            date={r.date}
-            entries={logsByDate.get(r.date) ?? []}
-            open={i === 0}
-          />
-        ))}
+        <h2 className="text-sm font-semibold text-stone-500">This month</h2>
+        <div className="scroll-panel flex max-h-112 flex-col gap-2 overflow-auto pr-1">
+          {displayDayRows.map((r, i) => (
+            <DayBlock
+              key={r.date}
+              date={r.date}
+              burned={r.burned}
+              hasEnergyData={r.hasData}
+              entries={logsByDate.get(r.date) ?? []}
+              open={i === 0}
+            />
+          ))}
+        </div>
       </div>
+
+      {displayMonthRows.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-stone-500">By month</h2>
+          <div className="scroll-panel flex max-h-96 flex-col gap-2 overflow-auto pr-1">
+            {displayMonthRows.map((m) => (
+              <MonthBlock
+                key={m.month}
+                label={m.label}
+                burned={m.burned}
+                consumed={m.consumed}
+                deficit={m.deficit}
+                carbs={m.carbs}
+                protein={m.protein}
+                fat={m.fat}
+                hasFoodData={m.hasFoodData}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
