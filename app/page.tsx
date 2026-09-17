@@ -1,7 +1,7 @@
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyEnergy, foodLog, foods, type MealType } from "@/db/schema";
-import { todayLjubljana } from "@/lib/date";
+import { todayLabelLjubljana, todayLjubljana } from "@/lib/date";
 import { Nav } from "@/components/Nav";
 import { MealBlock } from "@/components/MealBlock";
 import { addFood, deleteFood } from "./actions";
@@ -16,6 +16,7 @@ const MEALS: { meal: MealType; title: string }[] = [
 
 export default async function Home() {
   const today = todayLjubljana();
+  const todayLabel = todayLabelLjubljana();
 
   const [energyRows, entries, foodList] = await Promise.all([
     db.select().from(dailyEnergy).where(eq(dailyEnergy.date, today)).limit(1),
@@ -42,11 +43,11 @@ export default async function Home() {
     <div className="flex flex-1 flex-col max-w-md w-full mx-auto p-6 gap-6">
       <Nav current="today" />
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-stone-500">{today}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-xl font-bold tracking-tight">{todayLabel}</h1>
         {!energy && (
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-            No sync yet today
+            No sync yet
           </span>
         )}
       </div>

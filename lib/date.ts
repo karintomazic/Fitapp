@@ -13,6 +13,13 @@ const monthFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
 });
 
+const dayLabelFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: TIME_ZONE,
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+});
+
 // YYYY-MM-DD in the local Slovenian date, regardless of server timezone.
 export function todayLjubljana(): string {
   return dateFormatter.format(new Date());
@@ -43,4 +50,9 @@ export function datesInCurrentMonthLjubljana(): string[] {
 // "September 2026" for a "YYYY-MM" key.
 export function monthLabel(monthKey: string): string {
   return monthFormatter.format(new Date(`${monthKey}-15T12:00:00Z`));
+}
+
+// "Thursday, September 17" for today, Ljubljana-local.
+export function todayLabelLjubljana(): string {
+  return dayLabelFormatter.format(new Date());
 }
