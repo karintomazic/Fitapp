@@ -1,7 +1,9 @@
 import {
   date,
   integer,
+  pgEnum,
   pgTable,
+  real,
   serial,
   text,
   timestamp,
@@ -15,11 +17,35 @@ export const dailyEnergy = pgTable("daily_energy", {
   syncedAt: timestamp("synced_at", { withTimezone: true }),
 });
 
-// Many rows per day.
+export const mealEnum = pgEnum("meal", ["breakfast", "lunch", "dinner"]);
+export type MealType = (typeof mealEnum.enumValues)[number];
+
+// Personal food library. Defined once with macros per 100g, then reused by
+// grams each time it's logged.
+export const foods = pgTable("foods", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  kcalPer100g: real("kcal_per_100g").notNull(),
+  carbsPer100g: real("carbs_per_100g").notNull(),
+  proteinPer100g: real("protein_per_100g").notNull(),
+  fatPer100g: real("fat_per_100g").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// One logged portion of a food, assigned to a meal on a given day. Macros are
+// snapshotted at log time so editing a food later doesn't rewrite history.
 export const foodLog = pgTable("food_log", {
   id: serial("id").primaryKey(),
   date: date("date").notNull(), // local date
-  label: text("label").notNull(), // "lunch", "yogurt", whatever
+  meal: mealEnum("meal").notNull(),
+  foodId: integer("food_id").references(() => foods.id, {
+    onDelete: "set null",
+  }),
+  label: text("label").notNull(), // food name snapshot at log time
+  grams: integer("grams").notNull(),
   kcal: integer("kcal").notNull(),
+  carbs: real("carbs").notNull(),
+  protein: real("protein").notNull(),
+  fat: real("fat").notNull(),
   loggedAt: timestamp("logged_at", { withTimezone: true }).defaultNow(),
 });

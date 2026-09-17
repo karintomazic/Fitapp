@@ -1,22 +1,30 @@
-import { desc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { dailyEnergy, foodLog } from "@/db/schema";
+import { dailyEnergy, foodLog, foods, type MealType } from "@/db/schema";
 import { todayLjubljana } from "@/lib/date";
 import { Nav } from "@/components/Nav";
-import { addFoodEntry, deleteFoodEntry } from "./actions";
+import { MealBlock } from "@/components/MealBlock";
+import { addFood, deleteFood } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const MEALS: { meal: MealType; title: string }[] = [
+  { meal: "breakfast", title: "Breakfast" },
+  { meal: "lunch", title: "Lunch" },
+  { meal: "dinner", title: "Dinner" },
+];
 
 export default async function Home() {
   const today = todayLjubljana();
 
-  const [energyRows, entries] = await Promise.all([
+  const [energyRows, entries, foodList] = await Promise.all([
     db.select().from(dailyEnergy).where(eq(dailyEnergy.date, today)).limit(1),
     db
       .select()
       .from(foodLog)
       .where(eq(foodLog.date, today))
-      .orderBy(desc(foodLog.loggedAt)),
+      .orderBy(asc(foodLog.loggedAt)),
+    db.select().from(foods).orderBy(asc(foods.name)),
   ]);
 
   const energy = energyRows[0];
@@ -26,87 +34,128 @@ export default async function Home() {
   const consumedKcal = entries.reduce((sum, e) => sum + e.kcal, 0);
   const deficit = burnedKcal - consumedKcal;
 
+  const entriesByMeal = Object.fromEntries(
+    MEALS.map(({ meal }) => [meal, entries.filter((e) => e.meal === meal)]),
+  ) as Record<MealType, typeof entries>;
+
   return (
-    <div className="flex flex-1 flex-col max-w-md w-full mx-auto p-6 gap-8">
+    <div className="flex flex-1 flex-col max-w-md w-full mx-auto p-6 gap-6">
       <Nav current="today" />
 
-      <div>
-        <p className="text-sm text-zinc-500">{today}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-stone-500">{today}</p>
         {!energy && (
-          <p className="mt-1 text-sm text-amber-600">
-            No Health sync yet today — burned shows as 0.
-          </p>
+          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+            No sync yet today
+          </span>
         )}
       </div>
 
       <div className="grid grid-cols-3 gap-3 text-center">
-        <Stat label="Burned" value={burnedKcal} />
-        <Stat label="Eaten" value={consumedKcal} />
-        <Stat label="Deficit" value={deficit} emphasize />
+        <Stat icon="🔥" label="Burned" value={burnedKcal} />
+        <Stat icon="🍽️" label="Eaten" value={consumedKcal} />
+        <Stat icon="⚖️" label="Deficit" value={deficit} emphasize />
       </div>
 
-      <form action={addFoodEntry} className="flex gap-2">
-        <input
-          name="label"
-          placeholder="lunch"
-          required
-          className="min-w-0 flex-1 rounded border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-        />
-        <input
-          name="kcal"
-          type="number"
-          inputMode="numeric"
-          placeholder="kcal"
-          required
-          className="w-24 rounded border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-        />
-        <button
-          type="submit"
-          className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
-        >
-          Add
-        </button>
-      </form>
-
-      <ul className="flex flex-col gap-2">
-        {entries.length === 0 && (
-          <li className="text-sm text-zinc-500">Nothing logged yet today.</li>
-        )}
-        {entries.map((entry) => (
-          <li
-            key={entry.id}
-            className="flex items-center justify-between gap-3 rounded border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800"
-          >
-            <span className="min-w-0 flex-1 truncate">{entry.label}</span>
-            <span className="text-zinc-500">{entry.kcal} kcal</span>
-            <form action={deleteFoodEntry}>
-              <input type="hidden" name="id" value={entry.id} />
-              <button
-                type="submit"
-                aria-label={`Delete ${entry.label}`}
-                className="text-zinc-400 hover:text-red-600"
-              >
-                ✕
-              </button>
-            </form>
-          </li>
+      <div className="flex flex-col gap-4">
+        {MEALS.map(({ meal, title }) => (
+          <MealBlock
+            key={meal}
+            meal={meal}
+            title={title}
+            entries={entriesByMeal[meal]}
+            foods={foodList}
+          />
         ))}
-      </ul>
+      </div>
+
+      <details className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+        <summary className="cursor-pointer list-none text-sm font-semibold [&::-webkit-details-marker]:hidden">
+          Food library
+        </summary>
+
+        <ul className="mt-3 flex flex-col gap-2">
+          {foodList.length === 0 && (
+            <li className="px-1 text-xs text-stone-400">No foods yet.</li>
+          )}
+          {foodList.map((food) => (
+            <li
+              key={food.id}
+              className="flex items-center gap-3 rounded-xl bg-stone-50 px-3 py-2 dark:bg-stone-800/60"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-sm font-semibold text-stone-500 dark:bg-stone-900 dark:text-stone-400">
+                {food.name.charAt(0).toUpperCase()}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                {food.name}
+              </span>
+              <span className="text-xs tabular-nums text-stone-400">
+                {food.kcalPer100g} kcal/100g
+              </span>
+              <form action={deleteFood}>
+                <input type="hidden" name="id" value={food.id} />
+                <button
+                  type="submit"
+                  aria-label={`Remove ${food.name}`}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-stone-400 hover:bg-stone-200 hover:text-red-600 dark:hover:bg-stone-700"
+                >
+                  ✕
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
+
+        <form action={addFood} className="mt-3 grid grid-cols-2 gap-2">
+          <input
+            name="name"
+            placeholder="name (e.g. pistachios)"
+            required
+            className="col-span-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm dark:border-stone-700 dark:bg-stone-800/60"
+          />
+          <MacroInput name="kcalPer100g" label="kcal/100g" />
+          <MacroInput name="carbsPer100g" label="carbs/100g" />
+          <MacroInput name="proteinPer100g" label="protein/100g" />
+          <MacroInput name="fatPer100g" label="fat/100g" />
+          <button
+            type="submit"
+            className="col-span-2 rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white dark:bg-stone-100 dark:text-stone-900"
+          >
+            Save food
+          </button>
+        </form>
+      </details>
     </div>
   );
 }
 
+function MacroInput({ name, label }: { name: string; label: string }) {
+  return (
+    <input
+      name={name}
+      type="number"
+      step="0.1"
+      placeholder={label}
+      required
+      className="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm dark:border-stone-700 dark:bg-stone-800/60"
+    />
+  );
+}
+
 function Stat({
+  icon,
   label,
   value,
   emphasize,
 }: {
+  icon: string;
   label: string;
   value: number;
   emphasize?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-200 py-4 dark:border-zinc-800">
+    <div className="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white py-4 dark:border-stone-800 dark:bg-stone-900">
+      <span className="text-base">{icon}</span>
       <p
         className={
           emphasize
@@ -116,7 +165,9 @@ function Stat({
       >
         {value}
       </p>
-      <p className="text-xs text-zinc-500">{label}</p>
+      <p className="text-[11px] font-medium tracking-wide text-stone-400 uppercase">
+        {label}
+      </p>
     </div>
   );
 }
