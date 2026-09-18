@@ -17,6 +17,13 @@ export const dailyEnergy = pgTable("daily_energy", {
   syncedAt: timestamp("synced_at", { withTimezone: true }),
 });
 
+// One row per day, manually logged — morning and/or evening weigh-in.
+export const weightLog = pgTable("weight_log", {
+  date: date("date").primaryKey(), // local date, Europe/Ljubljana
+  morningKg: real("morning_kg"),
+  eveningKg: real("evening_kg"),
+});
+
 export const mealEnum = pgEnum("meal", ["breakfast", "lunch", "dinner"]);
 export type MealType = (typeof mealEnum.enumValues)[number];
 

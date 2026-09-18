@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-export function Nav({ current }: { current: "today" | "history" }) {
+export function Nav({
+  current,
+}: {
+  current: "today" | "history" | "weight";
+}) {
   return (
     <nav className="flex gap-1 self-start rounded-full border border-stone-200 bg-white p-1 text-sm dark:border-stone-800 dark:bg-stone-900">
       <NavLink href="/" active={current === "today"}>
@@ -8,6 +12,9 @@ export function Nav({ current }: { current: "today" | "history" }) {
       </NavLink>
       <NavLink href="/history" active={current === "history"}>
         History
+      </NavLink>
+      <NavLink href="/weight" active={current === "weight"}>
+        Weight
       </NavLink>
     </nav>
   );

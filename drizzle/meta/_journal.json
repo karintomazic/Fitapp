@@ -15,6 +15,13 @@
       "when": 1789664310126,
       "tag": "0001_silent_sister_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789668446261,
+      "tag": "0002_clammy_exiles",
+      "breakpoints": true
     }
   ]
 }

@@ -3,7 +3,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
-import { foodLog, foods, mealEnum, type MealType } from "@/db/schema";
+import { foodLog, foods, mealEnum, weightLog, type MealType } from "@/db/schema";
 import { todayLjubljana } from "@/lib/date";
 import { macrosForGrams } from "@/lib/nutrition";
 
@@ -83,4 +83,43 @@ export async function deleteFoodEntry(formData: FormData) {
   await db.delete(foodLog).where(eq(foodLog.id, id));
 
   revalidatePath("/");
+}
+
+// Blank fields mean "leave unchanged" rather than "clear" — the morning
+// weight is often logged hours before the evening one.
+export async function logWeight(formData: FormData) {
+  const morningRaw = String(formData.get("morningKg") ?? "").trim();
+  const eveningRaw = String(formData.get("eveningKg") ?? "").trim();
+  const morningKg = morningRaw === "" ? undefined : Number(morningRaw);
+  const eveningKg = eveningRaw === "" ? undefined : Number(eveningRaw);
+
+  if (morningKg === undefined && eveningKg === undefined) {
+    return;
+  }
+  if (
+    (morningKg !== undefined && !Number.isFinite(morningKg)) ||
+    (eveningKg !== undefined && !Number.isFinite(eveningKg))
+  ) {
+    return;
+  }
+
+  const date = todayLjubljana();
+  const [existing] = await db
+    .select()
+    .from(weightLog)
+    .where(eq(weightLog.date, date))
+    .limit(1);
+
+  const nextMorningKg = morningKg ?? existing?.morningKg ?? null;
+  const nextEveningKg = eveningKg ?? existing?.eveningKg ?? null;
+
+  await db
+    .insert(weightLog)
+    .values({ date, morningKg: nextMorningKg, eveningKg: nextEveningKg })
+    .onConflictDoUpdate({
+      target: weightLog.date,
+      set: { morningKg: nextMorningKg, eveningKg: nextEveningKg },
+    });
+
+  revalidatePath("/weight");
 }
