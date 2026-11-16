@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 const DAY_NAMES = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
 // The current week, Monday first. Today is highlighted; a dot marks days
-// with food logged.
+// with food logged. Tapping a past day opens it in the calendar.
 export function WeekStrip({
   week,
   today,
@@ -21,11 +23,9 @@ export function WeekStrip({
             <span className="text-[10px] font-semibold tracking-wide text-muted">
               {DAY_NAMES[i]}
             </span>
-            <span
-              aria-current={isToday ? "date" : undefined}
-              className={`relative mt-1 flex h-10 items-center justify-center rounded-xl text-sm font-semibold tabular-nums ${
-                isToday ? "bg-mint text-white" : "glass"
-              }`}
+            <DayBox
+              href={isFuture ? undefined : `/calendar?month=${date.slice(0, 7)}&day=${date}`}
+              isToday={isToday}
             >
               {Number(date.slice(8, 10))}
               {loggedDates.has(date) && (
@@ -35,10 +35,31 @@ export function WeekStrip({
                   }`}
                 />
               )}
-            </span>
+            </DayBox>
           </li>
         );
       })}
     </ol>
+  );
+}
+
+function DayBox({
+  href,
+  isToday,
+  children,
+}: {
+  href?: string;
+  isToday: boolean;
+  children: React.ReactNode;
+}) {
+  const className = `relative mt-1 flex h-10 items-center justify-center rounded-xl text-sm font-semibold tabular-nums ${
+    isToday ? "bg-mint text-white" : "glass"
+  }`;
+  return href ? (
+    <Link href={href} aria-current={isToday ? "date" : undefined} className={className}>
+      {children}
+    </Link>
+  ) : (
+    <span className={className}>{children}</span>
   );
 }

@@ -80,3 +80,36 @@ export function currentWeekLjubljana(): string[] {
 export function shortDayLabel(date: string): string {
   return shortDayFormatter.format(new Date(`${date}T12:00:00Z`)).replace(",", "");
 }
+
+const longDayFormatter = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "UTC",
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
+// "Saturday 14 November" for a "YYYY-MM-DD" date.
+export function longDayLabel(date: string): string {
+  return longDayFormatter.format(new Date(`${date}T12:00:00Z`)).replace(",", "");
+}
+
+// Every date (YYYY-MM-DD) in a "YYYY-MM" month, first to last.
+export function datesInMonth(monthKey: string): string[] {
+  const [year, month] = monthKey.split("-").map(Number);
+  const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return Array.from(
+    { length: days },
+    (_, i) => `${monthKey}-${String(i + 1).padStart(2, "0")}`,
+  );
+}
+
+// How many empty cells come before day 1 in a Monday-first calendar grid.
+export function mondayOffset(date: string): number {
+  return (new Date(`${date}T12:00:00Z`).getUTCDay() + 6) % 7;
+}
+
+// The "YYYY-MM" month before or after the given one.
+export function shiftMonth(monthKey: string, delta: number): string {
+  const [year, month] = monthKey.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1 + delta, 15)).toISOString().slice(0, 7);
+}

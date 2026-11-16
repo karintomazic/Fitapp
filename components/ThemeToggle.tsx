@@ -29,7 +29,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Switch between light and dark mode"
-      className="flex h-11 w-14 items-center justify-center rounded-full text-muted"
+      className="flex h-11 w-12 items-center justify-center rounded-full text-muted"
     >
       <svg
         viewBox="0 0 24 24"
