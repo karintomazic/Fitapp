@@ -98,11 +98,11 @@ export default async function History() {
   const displayMonthRows = [...monthRows].reverse(); // newest first
 
   return (
-    <div className="flex flex-1 flex-col max-w-2xl w-full mx-auto p-6 gap-6">
-      <Nav current="history" />
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-4 pt-[calc(env(safe-area-inset-top)+24px)] pb-32">
+      <h1 className="font-display text-2xl font-semibold">History</h1>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-sm font-semibold text-stone-500">This month</h2>
+        <h2 className="eyebrow">This month</h2>
         <div className="scroll-panel flex max-h-112 flex-col gap-2 overflow-auto pr-1">
           {displayDayRows.map((r, i) => (
             <DayBlock
@@ -119,7 +119,7 @@ export default async function History() {
 
       {displayMonthRows.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold text-stone-500">By month</h2>
+          <h2 className="eyebrow">By month</h2>
           <div className="scroll-panel flex max-h-96 flex-col gap-2 overflow-auto pr-1">
             {displayMonthRows.map((m) => (
               <MonthBlock
@@ -137,6 +137,8 @@ export default async function History() {
           </div>
         </div>
       )}
+
+      <Nav current="history" />
     </div>
   );
 }

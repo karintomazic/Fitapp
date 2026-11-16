@@ -1,3 +1,5 @@
+import { shortDayLabel } from "@/lib/date";
+
 export function WeightRow({
   date,
   morningKg,
@@ -15,32 +17,34 @@ export function WeightRow({
   const hasAnyData = hasWeight || hasEnergyData;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3 dark:border-stone-800 dark:bg-stone-900">
-      <span className="text-sm font-semibold whitespace-nowrap">{date}</span>
+    <div className="flex flex-wrap items-center justify-between gap-3 glass rounded-3xl px-4 py-3">
+      <span className="font-display text-base font-semibold whitespace-nowrap">
+        {shortDayLabel(date)}
+      </span>
       {hasAnyData ? (
         <div className="flex flex-wrap items-center justify-end gap-1.5">
           {morningKg !== null && (
-            <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium tabular-nums text-stone-500 dark:bg-stone-800 dark:text-stone-400">
-              ☀️ {morningKg} kg
+            <span className="rounded-full bg-glass-strong px-2.5 py-1 text-xs font-medium tabular-nums text-muted">
+              AM {morningKg} kg
             </span>
           )}
           {eveningKg !== null && (
-            <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium tabular-nums text-stone-500 dark:bg-stone-800 dark:text-stone-400">
-              🌙 {eveningKg} kg
+            <span className="rounded-full bg-glass-strong px-2.5 py-1 text-xs font-medium tabular-nums text-muted">
+              PM {eveningKg} kg
             </span>
           )}
           {hasEnergyData ? (
-            <span className="rounded-full bg-stone-900 px-2.5 py-1 text-xs font-semibold tabular-nums text-white dark:bg-stone-100 dark:text-stone-900">
+            <span className="rounded-full bg-mint px-2.5 py-1 text-xs font-semibold tabular-nums text-white">
               {deficit} deficit
             </span>
           ) : (
-            <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] text-stone-400 dark:bg-stone-800">
+            <span className="rounded-full bg-peach/15 px-2 py-0.5 text-[11px] font-semibold text-peach-ink">
               no sync
             </span>
           )}
         </div>
       ) : (
-        <span className="text-xs text-stone-400">No data</span>
+        <span className="text-xs text-muted">No data</span>
       )}
     </div>
   );

@@ -48,14 +48,14 @@ export default async function Weight() {
   const displayRows = [...rows].reverse(); // newest first
 
   return (
-    <div className="flex flex-1 flex-col max-w-2xl w-full mx-auto p-6 gap-6">
-      <Nav current="weight" />
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-5 px-4 pt-[calc(env(safe-area-inset-top)+24px)] pb-32">
+      <h1 className="font-display text-2xl font-semibold">Weight</h1>
 
-      <div className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
-        <h2 className="text-sm font-semibold">Log today&apos;s weight</h2>
+      <div className="glass rounded-3xl p-4">
+        <h2 className="font-display text-base font-semibold">Log today&apos;s weight</h2>
         <form action={logWeight} className="mt-3 flex items-end gap-2">
-          <label className="flex-1">
-            <span className="text-xs text-stone-400">Morning (kg)</span>
+          <label className="min-w-0 flex-1">
+            <span className="eyebrow">Morning (kg)</span>
             <input
               name="morningKg"
               type="number"
@@ -63,11 +63,11 @@ export default async function Weight() {
               inputMode="decimal"
               placeholder="kg"
               defaultValue={todayWeight?.morningKg ?? ""}
-              className="mt-1 w-full rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm dark:border-stone-700 dark:bg-stone-800/60"
+              className="field mt-1 w-full"
             />
           </label>
-          <label className="flex-1">
-            <span className="text-xs text-stone-400">Evening (kg)</span>
+          <label className="min-w-0 flex-1">
+            <span className="eyebrow">Evening (kg)</span>
             <input
               name="eveningKg"
               type="number"
@@ -75,12 +75,12 @@ export default async function Weight() {
               inputMode="decimal"
               placeholder="kg"
               defaultValue={todayWeight?.eveningKg ?? ""}
-              className="mt-1 w-full rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm dark:border-stone-700 dark:bg-stone-800/60"
+              className="field mt-1 w-full"
             />
           </label>
           <button
             type="submit"
-            className="rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white dark:bg-stone-100 dark:text-stone-900"
+            className="btn-primary"
           >
             Save
           </button>
@@ -88,7 +88,7 @@ export default async function Weight() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-sm font-semibold text-stone-500">This month</h2>
+        <h2 className="eyebrow">This month</h2>
         <div className="scroll-panel flex max-h-112 flex-col gap-2 overflow-auto pr-1">
           {displayRows.map((r) => (
             <WeightRow
@@ -102,6 +102,8 @@ export default async function Weight() {
           ))}
         </div>
       </div>
+
+      <Nav current="weight" />
     </div>
   );
 }

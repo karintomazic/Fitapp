@@ -36,10 +36,10 @@ export function MealBlock({
   );
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+    <section className="glass rounded-3xl p-4">
       <header className="flex items-center justify-between">
-        <h2 className="text-base font-semibold">{title}</h2>
-        <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium tabular-nums text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+        <h2 className="font-display text-base font-semibold">{title}</h2>
+        <span className="rounded-full bg-mint/15 px-2.5 py-1 text-xs font-semibold tabular-nums text-mint-ink">
           {totals.kcal} kcal
         </span>
       </header>
@@ -54,29 +54,27 @@ export function MealBlock({
 
       <ul className="mt-3 flex flex-col gap-2">
         {entries.length === 0 && (
-          <li className="px-1 text-xs text-stone-400">Nothing yet.</li>
+          <li className="px-1 text-xs text-muted">Nothing yet.</li>
         )}
         {entries.map((entry) => (
           <li
             key={entry.id}
-            className="flex items-center gap-3 rounded-xl bg-stone-50 px-3 py-2 dark:bg-stone-800/60"
+            className="flex items-center gap-3 rounded-2xl bg-glass-strong px-3 py-2"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-sm font-semibold text-stone-500 dark:bg-stone-900 dark:text-stone-400">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-peach/20 text-sm font-semibold text-peach-ink">
               {entry.label.charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{entry.label}</p>
-              <p className="text-xs text-stone-400">{entry.grams}g</p>
+              <p className="text-xs text-muted">{entry.grams}g</p>
             </div>
-            <span className="text-sm font-semibold tabular-nums text-stone-600 dark:text-stone-300">
-              {entry.kcal}
-            </span>
+            <span className="text-sm font-semibold tabular-nums">{entry.kcal}</span>
             <form action={deleteFoodEntry}>
               <input type="hidden" name="id" value={entry.id} />
               <button
                 type="submit"
                 aria-label={`Delete ${entry.label}`}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-stone-400 hover:bg-stone-200 hover:text-red-600 dark:hover:bg-stone-700"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-peach/15 hover:text-peach-ink"
               >
                 ✕
               </button>
@@ -86,20 +84,17 @@ export function MealBlock({
       </ul>
 
       <details className="mt-3">
-        <summary className="cursor-pointer list-none rounded-full border border-dashed border-stone-300 px-3 py-1.5 text-center text-xs font-medium text-stone-500 [&::-webkit-details-marker]:hidden dark:border-stone-700 dark:text-stone-400">
+        <summary className="cursor-pointer list-none rounded-full border border-dashed border-mint/50 px-3 py-2 text-center text-sm font-semibold text-mint-ink [&::-webkit-details-marker]:hidden">
           + Add food
         </summary>
         <div className="mt-2 flex flex-col gap-1.5">
           {foods.length === 0 && (
-            <p className="px-1 text-xs text-stone-400">
-              No foods yet — add one below.
+            <p className="px-1 text-xs text-muted">
+              No foods yet. Add one in the food library below.
             </p>
           )}
           {foods.map((food) => (
-            <details
-              key={food.id}
-              className="rounded-xl bg-stone-50 px-3 py-2 dark:bg-stone-800/60"
-            >
+            <details key={food.id} className="rounded-2xl bg-glass-strong px-3 py-2.5">
               <summary className="cursor-pointer list-none text-sm font-medium [&::-webkit-details-marker]:hidden">
                 {food.name}
               </summary>
@@ -110,14 +105,12 @@ export function MealBlock({
                   name="grams"
                   type="number"
                   inputMode="numeric"
-                  placeholder="g"
+                  placeholder="grams"
+                  aria-label={`Grams of ${food.name}`}
                   required
-                  className="w-16 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-sm dark:border-stone-700 dark:bg-stone-900"
+                  className="field w-28"
                 />
-                <button
-                  type="submit"
-                  className="rounded-full bg-stone-900 px-3 py-1.5 text-xs font-medium text-white dark:bg-stone-100 dark:text-stone-900"
-                >
+                <button type="submit" className="btn-primary">
                   Add
                 </button>
               </form>

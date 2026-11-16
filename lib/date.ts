@@ -56,3 +56,27 @@ export function monthLabel(monthKey: string): string {
 export function todayLabelLjubljana(): string {
   return dayLabelFormatter.format(new Date());
 }
+
+const shortDayFormatter = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "UTC",
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+});
+
+// Monday to Sunday dates (YYYY-MM-DD) of the week that contains today,
+// Ljubljana-local.
+export function currentWeekLjubljana(): string[] {
+  const today = new Date(`${todayLjubljana()}T12:00:00Z`);
+  const mondayOffset = (today.getUTCDay() + 6) % 7;
+  return Array.from({ length: 7 }, (_, i) =>
+    new Date(today.getTime() + (i - mondayOffset) * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10),
+  );
+}
+
+// "Mon 16 Nov" for a "YYYY-MM-DD" date.
+export function shortDayLabel(date: string): string {
+  return shortDayFormatter.format(new Date(`${date}T12:00:00Z`)).replace(",", "");
+}

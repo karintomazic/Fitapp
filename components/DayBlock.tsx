@@ -1,4 +1,5 @@
 import type { MealType } from "@/db/schema";
+import { shortDayLabel } from "@/lib/date";
 import { round1 } from "@/lib/nutrition";
 import { MacroTag } from "./MacroTag";
 import { PeriodSummary } from "./PeriodSummary";
@@ -50,10 +51,12 @@ export function DayBlock({
   return (
     <details
       open={open}
-      className="rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900"
+      className="glass rounded-3xl"
     >
       <summary className="flex cursor-pointer list-none flex-col gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
-        <span className="text-sm font-semibold whitespace-nowrap">{date}</span>
+        <span className="font-display text-base font-semibold whitespace-nowrap">
+          {shortDayLabel(date)}
+        </span>
         <PeriodSummary
           burned={burned}
           consumed={consumed}
@@ -67,10 +70,10 @@ export function DayBlock({
       </summary>
 
       {entries.length > 0 && (
-        <div className="overflow-x-auto border-t border-stone-100 px-4 py-3 dark:border-stone-800">
+        <div className="overflow-x-auto border-t border-track px-4 py-3">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs tracking-wide text-stone-400 uppercase">
+              <tr className="text-left text-xs tracking-wide text-muted uppercase">
                 <th className="py-1.5 pr-2 font-medium">Meal</th>
                 <th className="py-1.5 pr-2 font-medium">Food</th>
                 <th className="py-1.5 pr-2 text-right font-medium">g</th>
@@ -82,13 +85,13 @@ export function DayBlock({
               {entries.map((e) => (
                 <tr
                   key={e.id}
-                  className="border-t border-stone-100 dark:border-stone-800"
+                  className="border-t border-track"
                 >
-                  <td className="py-2 pr-2 whitespace-nowrap text-xs text-stone-400">
+                  <td className="py-2 pr-2 whitespace-nowrap text-xs text-muted">
                     {MEAL_TITLES[e.meal]}
                   </td>
                   <td className="py-2 pr-2 truncate font-medium">{e.label}</td>
-                  <td className="py-2 pr-2 text-right tabular-nums text-stone-500">
+                  <td className="py-2 pr-2 text-right tabular-nums text-muted">
                     {e.grams}
                   </td>
                   <td className="py-2 pr-2 text-right font-semibold tabular-nums">

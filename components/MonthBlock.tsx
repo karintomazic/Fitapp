@@ -20,8 +20,8 @@ export function MonthBlock({
   hasFoodData: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 dark:border-stone-800 dark:bg-stone-900">
-      <span className="text-sm font-semibold whitespace-nowrap">{label}</span>
+    <div className="glass flex flex-col gap-2 rounded-3xl px-4 py-3">
+      <span className="font-display text-base font-semibold whitespace-nowrap">{label}</span>
       <PeriodSummary
         burned={burned}
         consumed={consumed}

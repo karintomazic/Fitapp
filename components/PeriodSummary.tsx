@@ -20,24 +20,28 @@ export function PeriodSummary({
   hasFoodData: boolean;
 }) {
   if (!hasEnergyData && !hasFoodData) {
-    return <span className="text-xs text-stone-400">No data</span>;
+    return <span className="text-xs text-muted">No data</span>;
   }
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {!hasEnergyData && (
-        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] text-stone-400 dark:bg-stone-800">
+        <span className="rounded-full bg-peach/15 px-2 py-0.5 text-[11px] font-semibold text-peach-ink">
           no sync
         </span>
       )}
-      <span className="rounded-full bg-stone-900 px-2.5 py-1 text-xs font-semibold tabular-nums text-white dark:bg-stone-100 dark:text-stone-900">
-        {deficit} deficit
+      <span
+        className={`rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums text-white ${
+          deficit >= 0 ? "bg-mint" : "bg-peach"
+        }`}
+      >
+        {deficit >= 0 ? `${deficit} deficit` : `${-deficit} surplus`}
       </span>
-      <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium tabular-nums text-stone-500 dark:bg-stone-800 dark:text-stone-400">
-        🔥 {burned}
+      <span className="rounded-full bg-glass-strong px-2.5 py-1 text-xs font-medium tabular-nums text-muted">
+        {burned} burned
       </span>
-      <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium tabular-nums text-stone-500 dark:bg-stone-800 dark:text-stone-400">
-        🍽️ {consumed}
+      <span className="rounded-full bg-glass-strong px-2.5 py-1 text-xs font-medium tabular-nums text-muted">
+        {consumed} eaten
       </span>
       {hasFoodData && (
         <>
