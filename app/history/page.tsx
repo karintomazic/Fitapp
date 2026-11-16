@@ -7,7 +7,6 @@ import {
   monthLabel,
 } from "@/lib/date";
 import { round1 } from "@/lib/nutrition";
-import { Nav } from "@/components/Nav";
 import { DayBlock } from "@/components/DayBlock";
 import { MonthBlock } from "@/components/MonthBlock";
 
@@ -137,8 +136,6 @@ export default async function History() {
           </div>
         </div>
       )}
-
-      <Nav current="history" />
     </div>
   );
 }

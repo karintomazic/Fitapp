@@ -8,7 +8,6 @@ import {
 } from "@/lib/date";
 import { GOALS } from "@/lib/goals";
 import { round1 } from "@/lib/nutrition";
-import { Nav } from "@/components/Nav";
 import { MealBlock } from "@/components/MealBlock";
 import { MacroRing } from "@/components/MacroRing";
 import { WeekStrip } from "@/components/WeekStrip";
@@ -205,8 +204,6 @@ export default async function Home() {
           </button>
         </form>
       </details>
-
-      <Nav current="today" />
     </div>
   );
 }

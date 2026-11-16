@@ -2,7 +2,6 @@ import { eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyEnergy, foodLog, weightLog } from "@/db/schema";
 import { currentMonthStartLjubljana, datesInCurrentMonthLjubljana, todayLjubljana } from "@/lib/date";
-import { Nav } from "@/components/Nav";
 import { WeightRow } from "@/components/WeightRow";
 import { logWeight } from "../actions";
 
@@ -102,8 +101,6 @@ export default async function Weight() {
           ))}
         </div>
       </div>
-
-      <Nav current="weight" />
     </div>
   );
 }

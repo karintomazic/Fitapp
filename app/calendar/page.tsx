@@ -12,7 +12,6 @@ import {
 } from "@/lib/date";
 import { GOALS } from "@/lib/goals";
 import { round1 } from "@/lib/nutrition";
-import { Nav } from "@/components/Nav";
 import { MacroTag } from "@/components/MacroTag";
 
 export const dynamic = "force-dynamic"; // build page fresh and never cache it
@@ -258,8 +257,6 @@ export default async function Calendar({
           </dl>
         )}
       </section>
-
-      <Nav current="calendar" />
     </div>
   );
 }

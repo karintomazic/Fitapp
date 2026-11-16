@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { ThemeToggle } from "./ThemeToggle";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 type Page = "today" | "calendar" | "history" | "weight";
 
@@ -41,43 +44,75 @@ const ITEMS: { page: Page; href: string; label: string; icon: React.ReactNode }[
   },
 ];
 
-// Glass tab bar fixed to the bottom of the screen, clear of the iPhone home bar.
-export function Nav({ current }: { current: Page }) {
+function hrefForPath(pathname: string) {
+  const item = ITEMS.find((i) =>
+    i.href === "/" ? pathname === "/" : pathname.startsWith(i.href),
+  );
+  return item?.href;
+}
+
+// Lives in the root layout so it stays on screen between pages and the
+// mint pill can slide from tab to tab instead of being redrawn.
+export function Nav() {
+  const pathname = usePathname();
+  // the tab you just tapped, so the pill moves before the new page has loaded
+  const [tapped, setTapped] = useState<{ href: string; from: string } | null>(
+    null,
+  );
+
+  const activeHref =
+    tapped && tapped.from === pathname ? tapped.href : hrefForPath(pathname);
+  const activeIndex = ITEMS.findIndex((i) => i.href === activeHref);
+
+  const tabWidth = 100 / ITEMS.length;
+
   return (
     <nav className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-10 px-4">
-      <div className="glass-bar mx-auto flex max-w-md items-center justify-around rounded-full p-1.5">
-        {ITEMS.map(({ page, href, label, icon }) => {
-          const active = page === current;
-          return (
-            <Link
-              key={page}
-              href={href}
-              aria-label={label}
-              aria-current={active ? "page" : undefined}
-              className={
-                active
-                  ? "flex h-11 items-center gap-2 rounded-full bg-mint px-4 text-sm font-semibold text-white"
-                  : "flex h-11 w-12 items-center justify-center rounded-full text-muted"
-              }
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
+      <div className="glass-bar mx-auto flex max-w-md items-center rounded-full p-1.5">
+        <div
+          className="relative grid flex-1"
+          style={{ gridTemplateColumns: `repeat(${ITEMS.length}, 1fr)` }}
+        >
+          {activeIndex !== -1 && (
+            <span
+              aria-hidden
+              className="absolute inset-y-0 rounded-full bg-mint transition-[left] duration-300 ease-out motion-reduce:transition-none"
+              style={{
+                left: `${activeIndex * tabWidth}%`,
+                width: `${tabWidth}%`,
+              }}
+            />
+          )}
+          {ITEMS.map(({ page, href, label, icon }, i) => {
+            const isActive = i === activeIndex;
+            return (
+              <Link
+                key={page}
+                href={href}
+                onClick={() => setTapped({ href, from: pathname })}
+                aria-label={label}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative flex h-11 items-center justify-center rounded-full transition-colors duration-300 ${
+                  isActive ? "text-white" : "text-muted"
+                }`}
               >
-                {icon}
-              </svg>
-              {active && label}
-            </Link>
-          );
-        })}
-        <ThemeToggle />
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  {icon}
+                </svg>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
