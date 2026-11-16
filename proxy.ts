@@ -16,6 +16,6 @@ export const config = {
   // skip the login page, the Apple Watch sync (it has its own token),
   // Next.js files and the icons/manifest the phone needs for the home screen
   matcher: [
-    "/((?!login|api/sync-health|_next/static|_next/image|favicon.ico|manifest.json|apple-touch-icon.png|icon-192.png|icon-512.png).*)",
+    "/((?!login|api/sync-health|_next/static|_next/image|favicon.ico|icon.svg|manifest.json|apple-touch-icon.png|icon-192.png|icon-512.png).*)",
   ],
 };

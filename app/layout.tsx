@@ -15,13 +15,13 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Calorie Deficit Tracker",
+  title: "Fitapp",
   description: "Daily calorie deficit at a glance",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Deficit",
+    title: "Fitapp",
   },
   icons: {
     apple: "/apple-touch-icon.png",
