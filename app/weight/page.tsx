@@ -4,6 +4,7 @@ import { dailyEnergy, foodLog, weightLog } from "@/db/schema";
 import { currentMonthStartLjubljana, datesInCurrentMonthLjubljana, todayLjubljana } from "@/lib/date";
 import { WeightRow } from "@/components/WeightRow";
 import { logWeight } from "../actions";
+import { DECIMAL_PATTERN } from "@/lib/parseDecimal";
 
 export const dynamic = "force-dynamic";
 
@@ -57,9 +58,9 @@ export default async function Weight() {
             <span className="eyebrow">Morning (kg)</span>
             <input
               name="morningKg"
-              type="number"
-              step="0.05"
+              type="text"
               inputMode="decimal"
+              pattern={DECIMAL_PATTERN}
               placeholder="kg"
               defaultValue={todayWeight?.morningKg ?? ""}
               className="field mt-1 w-full"
@@ -69,9 +70,9 @@ export default async function Weight() {
             <span className="eyebrow">Evening (kg)</span>
             <input
               name="eveningKg"
-              type="number"
-              step="0.05"
+              type="text"
               inputMode="decimal"
+              pattern={DECIMAL_PATTERN}
               placeholder="kg"
               defaultValue={todayWeight?.eveningKg ?? ""}
               className="field mt-1 w-full"

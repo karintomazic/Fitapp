@@ -12,6 +12,7 @@ import { MealBlock } from "@/components/MealBlock";
 import { MacroRing } from "@/components/MacroRing";
 import { WeekStrip } from "@/components/WeekStrip";
 import { addFood, deleteFood } from "./actions";
+import { DECIMAL_PATTERN } from "@/lib/parseDecimal";
 
 export const dynamic = "force-dynamic";
 
@@ -214,9 +215,9 @@ function MacroInput({ name, label }: { name: string; label: string }) {
   return (
     <input
       name={name}
-      type="number"
-      step="0.1"
+      type="text"
       inputMode="decimal"
+      pattern={DECIMAL_PATTERN}
       placeholder={label}
       aria-label={label}
       required

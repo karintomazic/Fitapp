@@ -1,6 +1,7 @@
 import { getProfile } from "@/lib/goals";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { saveProfile } from "../actions";
+import { DECIMAL_PATTERN } from "@/lib/parseDecimal";
 import { logout } from "../login/actions";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +11,7 @@ type SettingsFieldProps = {
   label: string;
   unit?: string;
   defaultValue: string | number | null;
-  type?: "text" | "number";
-  step?: string;
+  type?: "text" | "whole" | "decimal";
   required?: boolean;
 };
 
@@ -20,10 +20,16 @@ function SettingsField({
   label,
   unit,
   defaultValue,
-  type = "number",
-  step = "1",
+  type = "whole",
   required = false,
 }: SettingsFieldProps) {
+  let inputMode: "numeric" | "decimal" | undefined;
+  if (type === "whole") {
+    inputMode = "numeric";
+  } else if (type === "decimal") {
+    inputMode = "decimal";
+  }
+
   return (
     <label className="flex min-w-0 flex-col gap-1">
       <span className="eyebrow">
@@ -32,9 +38,9 @@ function SettingsField({
       </span>
       <input
         name={name}
-        type={type}
-        step={type === "number" ? step : undefined}
-        inputMode={type === "number" ? "decimal" : undefined}
+        type={type === "whole" ? "number" : "text"}
+        inputMode={inputMode}
+        pattern={type === "decimal" ? DECIMAL_PATTERN : undefined}
         defaultValue={defaultValue ?? ""}
         required={required}
         className="field w-full"
@@ -99,13 +105,14 @@ export default async function Settings({
               name="heightCm"
               label="Height"
               unit="cm"
+              type="decimal"
               defaultValue={profile.heightCm}
             />
             <SettingsField
               name="goalWeightKg"
               label="Goal weight"
               unit="kg"
-              step="0.1"
+              type="decimal"
               defaultValue={profile.goalWeightKg}
             />
           </div>

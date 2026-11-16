@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { PROFILE_ID } from "@/lib/goals";
 import { requireSession } from "@/lib/session";
+import { parseDecimal } from "@/lib/parseDecimal";
 import { todayLjubljana } from "@/lib/date";
 import { macrosForGrams } from "@/lib/nutrition";
 
@@ -21,10 +22,10 @@ export async function addFood(formData: FormData) {
   await requireSession();
 
   const name = String(formData.get("name") ?? "").trim();
-  const kcalPer100g = Number(formData.get("kcalPer100g"));
-  const carbsPer100g = Number(formData.get("carbsPer100g"));
-  const proteinPer100g = Number(formData.get("proteinPer100g"));
-  const fatPer100g = Number(formData.get("fatPer100g"));
+  const kcalPer100g = parseDecimal(String(formData.get("kcalPer100g") ?? ""));
+  const carbsPer100g = parseDecimal(String(formData.get("carbsPer100g") ?? ""));
+  const proteinPer100g = parseDecimal(String(formData.get("proteinPer100g") ?? ""));
+  const fatPer100g = parseDecimal(String(formData.get("fatPer100g") ?? ""));
 
   if (
     !name ||
@@ -110,8 +111,8 @@ export async function logWeight(formData: FormData) {
 
   const morningRaw = String(formData.get("morningKg") ?? "").trim();
   const eveningRaw = String(formData.get("eveningKg") ?? "").trim();
-  const morningKg = morningRaw === "" ? undefined : Number(morningRaw);
-  const eveningKg = eveningRaw === "" ? undefined : Number(eveningRaw);
+  const morningKg = morningRaw === "" ? undefined : parseDecimal(morningRaw);
+  const eveningKg = eveningRaw === "" ? undefined : parseDecimal(eveningRaw);
 
   if (morningKg === undefined && eveningKg === undefined) {
     return;
@@ -147,7 +148,7 @@ export async function logWeight(formData: FormData) {
 // empty or invalid fields are saved as "not set"
 function optionalNumber(formData: FormData, field: string) {
   const raw = String(formData.get(field) ?? "").trim();
-  const value = Number(raw);
+  const value = parseDecimal(raw);
   return raw === "" || !Number.isFinite(value) || value <= 0 ? null : value;
 }
 
