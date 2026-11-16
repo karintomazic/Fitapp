@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "./ThemeToggle";
 
 type Page = "today" | "history" | "weight";
 
@@ -38,7 +39,7 @@ const ITEMS: { page: Page; href: string; label: string; icon: React.ReactNode }[
 export function Nav({ current }: { current: Page }) {
   return (
     <nav className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-10 px-4">
-      <div className="glass mx-auto flex max-w-md items-center justify-around rounded-full p-1.5">
+      <div className="glass-bar mx-auto flex max-w-md items-center justify-around rounded-full p-1.5">
         {ITEMS.map(({ page, href, label, icon }) => {
           const active = page === current;
           return (
@@ -70,6 +71,7 @@ export function Nav({ current }: { current: Page }) {
             </Link>
           );
         })}
+        <ThemeToggle />
       </div>
     </nav>
   );

@@ -22,28 +22,40 @@
   --scrollbar-thumb: rgb(35 51 45 / 0.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-from: #0e2620;
-    --bg-via: #111916;
-    --bg-to: #2a1a13;
-    --background: #111916;
-    --foreground: #e6efeb;
-    --muted: #93a39c;
-    --glass: rgb(255 255 255 / 0.06);
-    --glass-strong: rgb(255 255 255 / 0.1);
-    --glass-border: rgb(255 255 255 / 0.1);
-    --track: rgb(255 255 255 / 0.12);
-    --shadow: rgb(0 0 0 / 0.45);
-    --mint: #5cc0a3;
-    --mint-ink: #86dac1;
-    --peach: #f08e72;
-    --peach-ink: #f6ab95;
-    --amber: #e8bf6e;
-    --amber-ink: #f0d08f;
-    --scrollbar-thumb: rgb(255 255 255 / 0.2);
-  }
+/* Light is the default. Dark mode only turns on when you pick it with the
+   toggle in the tab bar, which sets data-theme="dark" on <html>. It does not
+   follow the phone's system setting. color-scheme keeps form controls matching. */
+:root {
+  color-scheme: light;
+  --bar: rgb(255 255 255 / 0.85);
 }
+
+/* Dark: deep mint fading into warm peach-brown, same accents as light. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-from: #173d34;
+  --bg-via: #13221e;
+  --bg-to: #3a2620;
+  --background: #13221e;
+  --foreground: #eaf3ef;
+  --muted: #9fb5ac;
+  --glass: rgb(255 255 255 / 0.08);
+  --glass-strong: rgb(255 255 255 / 0.12);
+  --glass-border: rgb(255 255 255 / 0.14);
+  --track: rgb(255 255 255 / 0.14);
+  --shadow: rgb(0 0 0 / 0.45);
+  --bar: rgb(24 44 38 / 0.92);
+  --mint: #4fb497;
+  --mint-ink: #8fe0c7;
+  --peach: #f2937a;
+  --peach-ink: #f7b29f;
+  --amber: #e8bf6e;
+  --amber-ink: #f3d595;
+  --scrollbar-thumb: rgb(255 255 255 / 0.2);
+}
+
+/* dark: utilities follow the toggle, not the system setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme inline {
   --color-background: var(--background);
@@ -89,6 +101,15 @@ body::before {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 6px 18px -8px var(--shadow);
+}
+
+/* Like glass, but more solid, for the tab bar that floats over the page. */
+@utility glass-bar {
+  background: var(--bar);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px -10px var(--shadow);
 }
 
 /* Small uppercase label above a number. */
