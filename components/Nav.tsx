@@ -77,6 +77,8 @@ export function Nav() {
 
   const tabWidth = 100 / ITEMS.length;
 
+  if (pathname === "/login") return null;
+
   return (
     <nav className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+12px)] z-10 px-4">
       <div className="glass-bar mx-auto flex max-w-md items-center rounded-full p-1.5">

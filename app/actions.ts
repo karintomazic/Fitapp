@@ -13,10 +13,13 @@ import {
   type MealType,
 } from "@/db/schema";
 import { PROFILE_ID } from "@/lib/goals";
+import { requireSession } from "@/lib/session";
 import { todayLjubljana } from "@/lib/date";
 import { macrosForGrams } from "@/lib/nutrition";
 
 export async function addFood(formData: FormData) {
+  await requireSession();
+
   const name = String(formData.get("name") ?? "").trim();
   const kcalPer100g = Number(formData.get("kcalPer100g"));
   const carbsPer100g = Number(formData.get("carbsPer100g"));
@@ -42,6 +45,8 @@ export async function addFood(formData: FormData) {
 }
 
 export async function deleteFood(formData: FormData) {
+  await requireSession();
+
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) {
     return;
@@ -53,6 +58,8 @@ export async function deleteFood(formData: FormData) {
 }
 
 export async function logFood(formData: FormData) {
+  await requireSession();
+
   const foodId = Number(formData.get("foodId"));
   const grams = Number(formData.get("grams"));
   const meal = String(formData.get("meal") ?? "");
@@ -84,6 +91,8 @@ export async function logFood(formData: FormData) {
 }
 
 export async function deleteFoodEntry(formData: FormData) {
+  await requireSession();
+
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) {
     return;
@@ -97,6 +106,8 @@ export async function deleteFoodEntry(formData: FormData) {
 // Blank fields mean "leave unchanged" rather than "clear" — the morning
 // weight is often logged hours before the evening one.
 export async function logWeight(formData: FormData) {
+  await requireSession();
+
   const morningRaw = String(formData.get("morningKg") ?? "").trim();
   const eveningRaw = String(formData.get("eveningKg") ?? "").trim();
   const morningKg = morningRaw === "" ? undefined : Number(morningRaw);
@@ -141,6 +152,8 @@ function optionalNumber(formData: FormData, field: string) {
 }
 
 export async function saveProfile(formData: FormData) {
+  await requireSession();
+
   const name = String(formData.get("name") ?? "").trim() || null;
   const age = optionalNumber(formData, "age");
   const heightCm = optionalNumber(formData, "heightCm");

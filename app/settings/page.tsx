@@ -1,6 +1,7 @@
 import { getProfile } from "@/lib/goals";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { saveProfile } from "../actions";
+import { logout } from "../login/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -158,6 +159,15 @@ export default async function Settings({
 
         <button type="submit" className="btn-primary">
           Save settings
+        </button>
+      </form>
+
+      <form action={logout}>
+        <button
+          type="submit"
+          className="w-full rounded-full border border-peach/40 px-4 py-2.5 text-sm font-semibold text-peach-ink"
+        >
+          Log out
         </button>
       </form>
     </div>
