@@ -56,3 +56,17 @@ export const foodLog = pgTable("food_log", {
   fat: real("fat").notNull(),
   loggedAt: timestamp("logged_at", { withTimezone: true }).defaultNow(),
 });
+
+// A single row (id 1) with profile info and daily goals, edited on Settings.
+export const profile = pgTable("profile", {
+  id: integer("id").primaryKey(),
+  name: text("name"),
+  age: integer("age"),
+  heightCm: real("height_cm"),
+  goalWeightKg: real("goal_weight_kg"),
+  kcalGoal: integer("kcal_goal").notNull().default(1800),
+  carbsGoal: integer("carbs_goal").notNull().default(200),
+  proteinGoal: integer("protein_goal").notNull().default(120),
+  fatGoal: integer("fat_goal").notNull().default(60),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});

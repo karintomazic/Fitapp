@@ -10,7 +10,7 @@ import {
   shiftMonth,
   todayLjubljana,
 } from "@/lib/date";
-import { GOALS } from "@/lib/goals";
+import { getProfile } from "@/lib/goals";
 import { round1 } from "@/lib/nutrition";
 import { MacroTag } from "@/components/MacroTag";
 
@@ -70,7 +70,8 @@ export default async function Calendar({
   const first = dates[0];
   const last = dates[dates.length - 1];
 
-  const [energyRows, foodRows, weightRows, selectedEntries] = await Promise.all([
+  const [energyRows, foodRows, weightRows, selectedEntries, profile] =
+    await Promise.all([
     db
       .select()
       .from(dailyEnergy)
@@ -95,6 +96,7 @@ export default async function Calendar({
       .from(foodLog)
       .where(eq(foodLog.date, selected))
       .orderBy(asc(foodLog.loggedAt)),
+    getProfile(),
   ]);
 
   const energyByDate = new Map(energyRows.map((r) => [r.date, r]));
@@ -128,7 +130,7 @@ export default async function Calendar({
   const avgEaten = loggedDays.length
     ? Math.round(loggedDays.reduce((s, d) => s + d.eaten, 0) / loggedDays.length)
     : 0;
-  const daysOnGoal = loggedDays.filter((d) => d.eaten <= GOALS.kcal).length;
+  const daysOnGoal = loggedDays.filter((d) => d.eaten <= profile.kcalGoal).length;
 
   const prevMonth = shiftMonth(month, -1);
   const nextMonth = shiftMonth(month, 1);
@@ -168,6 +170,7 @@ export default async function Calendar({
               isToday={day.date === today}
               isSelected={day.date === selected}
               isFuture={day.date > today}
+              kcalGoal={profile.kcalGoal}
             />
           ))}
         </div>
@@ -272,15 +275,17 @@ function DayCell({
   isToday,
   isSelected,
   isFuture,
+  kcalGoal,
 }: {
   day: DaySummary;
   href: string;
   isToday: boolean;
   isSelected: boolean;
   isFuture: boolean;
+  kcalGoal: number;
 }) {
   const deficit = day.hasEnergy && day.hasFood && day.burned > day.eaten;
-  const overGoal = day.hasFood && day.eaten > GOALS.kcal;
+  const overGoal = day.hasFood && day.eaten > kcalGoal;
   const weighed = day.morningKg !== null || day.eveningKg !== null;
   const label = Number(day.date.slice(8, 10));
 

@@ -6,7 +6,7 @@ import {
   todayLabelLjubljana,
   todayLjubljana,
 } from "@/lib/date";
-import { GOALS } from "@/lib/goals";
+import { getProfile } from "@/lib/goals";
 import { round1 } from "@/lib/nutrition";
 import { MealBlock } from "@/components/MealBlock";
 import { MacroRing } from "@/components/MacroRing";
@@ -26,7 +26,7 @@ export default async function Home() {
   const todayLabel = todayLabelLjubljana();
   const week = currentWeekLjubljana();
 
-  const [energyRows, entries, foodList, weekLogRows] = await Promise.all([
+  const [energyRows, entries, foodList, weekLogRows, profile] = await Promise.all([
     db.select().from(dailyEnergy).where(eq(dailyEnergy.date, today)).limit(1),
     db
       .select()
@@ -38,6 +38,7 @@ export default async function Home() {
       .selectDistinct({ date: foodLog.date })
       .from(foodLog)
       .where(and(gte(foodLog.date, week[0]), lte(foodLog.date, week[6]))),
+    getProfile(),
   ]);
 
   const energy = energyRows[0];
@@ -51,8 +52,9 @@ export default async function Home() {
   const protein = round1(entries.reduce((sum, e) => sum + e.protein, 0));
   const fat = round1(entries.reduce((sum, e) => sum + e.fat, 0));
 
-  const goalPct = Math.min(consumedKcal / GOALS.kcal, 1) * 100;
-  const kcalLeft = GOALS.kcal - consumedKcal;
+  const kcalGoal = profile.kcalGoal;
+  const goalPct = Math.min(consumedKcal / kcalGoal, 1) * 100;
+  const kcalLeft = kcalGoal - consumedKcal;
 
   const entriesByMeal = Object.fromEntries(
     MEALS.map(({ meal }) => [meal, entries.filter((e) => e.meal === meal)]),
@@ -63,7 +65,7 @@ export default async function Home() {
       <header className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl leading-tight font-semibold">
-            Hi Karin,
+            {profile.name ? `Hi ${profile.name},` : "Hi,"}
             <br />
             {todayLabel}
           </h1>
@@ -95,11 +97,11 @@ export default async function Home() {
                 {consumedKcal.toLocaleString("en")}
               </span>{" "}
               <span className="text-sm text-muted">
-                / {GOALS.kcal.toLocaleString("en")} kcal goal
+                / {kcalGoal.toLocaleString("en")} kcal goal
               </span>
             </p>
           </div>
-          <span className="eyebrow">{Math.round((consumedKcal / GOALS.kcal) * 100)}%</span>
+          <span className="eyebrow">{Math.round((consumedKcal / kcalGoal) * 100)}%</span>
         </div>
 
         <div
@@ -107,7 +109,7 @@ export default async function Home() {
           role="progressbar"
           aria-label="Calories eaten toward today's goal"
           aria-valuemin={0}
-          aria-valuemax={GOALS.kcal}
+          aria-valuemax={kcalGoal}
           aria-valuenow={consumedKcal}
         >
           <div
@@ -132,9 +134,9 @@ export default async function Home() {
       </section>
 
       <div className="grid grid-cols-3 gap-2.5">
-        <MacroRing label="Carbs" grams={carbs} goal={GOALS.carbs} color="var(--amber)" />
-        <MacroRing label="Protein" grams={protein} goal={GOALS.protein} color="var(--mint)" />
-        <MacroRing label="Fat" grams={fat} goal={GOALS.fat} color="var(--peach)" />
+        <MacroRing label="Carbs" grams={carbs} goal={profile.carbsGoal} color="var(--amber)" />
+        <MacroRing label="Protein" grams={protein} goal={profile.proteinGoal} color="var(--mint)" />
+        <MacroRing label="Fat" grams={fat} goal={profile.fatGoal} color="var(--peach)" />
       </div>
 
       <h2 className="-mb-2 font-display text-lg font-semibold">Today&apos;s meals</h2>

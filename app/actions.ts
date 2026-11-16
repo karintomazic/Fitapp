@@ -2,8 +2,17 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { foodLog, foods, mealEnum, weightLog, type MealType } from "@/db/schema";
+import {
+  foodLog,
+  foods,
+  mealEnum,
+  profile,
+  weightLog,
+  type MealType,
+} from "@/db/schema";
+import { PROFILE_ID } from "@/lib/goals";
 import { todayLjubljana } from "@/lib/date";
 import { macrosForGrams } from "@/lib/nutrition";
 
@@ -122,4 +131,48 @@ export async function logWeight(formData: FormData) {
     });
 
   revalidatePath("/weight");
+}
+
+// empty or invalid fields are saved as "not set"
+function optionalNumber(formData: FormData, field: string) {
+  const raw = String(formData.get(field) ?? "").trim();
+  const value = Number(raw);
+  return raw === "" || !Number.isFinite(value) || value <= 0 ? null : value;
+}
+
+export async function saveProfile(formData: FormData) {
+  const name = String(formData.get("name") ?? "").trim() || null;
+  const age = optionalNumber(formData, "age");
+  const heightCm = optionalNumber(formData, "heightCm");
+  const goalWeightKg = optionalNumber(formData, "goalWeightKg");
+
+  const kcalGoal = optionalNumber(formData, "kcalGoal");
+  const carbsGoal = optionalNumber(formData, "carbsGoal");
+  const proteinGoal = optionalNumber(formData, "proteinGoal");
+  const fatGoal = optionalNumber(formData, "fatGoal");
+
+  // goals are required, so don't save if one is missing
+  if (!kcalGoal || !carbsGoal || !proteinGoal || !fatGoal) {
+    redirect("/settings?error=goals");
+  }
+
+  const values = {
+    name,
+    age: age === null ? null : Math.round(age),
+    heightCm,
+    goalWeightKg,
+    kcalGoal: Math.round(kcalGoal),
+    carbsGoal: Math.round(carbsGoal),
+    proteinGoal: Math.round(proteinGoal),
+    fatGoal: Math.round(fatGoal),
+    updatedAt: new Date(),
+  };
+
+  await db
+    .insert(profile)
+    .values({ id: PROFILE_ID, ...values })
+    .onConflictDoUpdate({ target: profile.id, set: values });
+
+  revalidatePath("/", "layout");
+  redirect("/settings?saved=1");
 }
