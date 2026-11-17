@@ -150,6 +150,15 @@ body::before {
   }
 }
 
+/* A frosted pill for secondary buttons and badges on the landing page. */
+@utility glass-pill {
+  border-radius: 9999px;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
 .scroll-panel {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
