@@ -52,6 +52,7 @@ Create `.env.local` with:
 DATABASE_URL=postgres://...      # your Postgres connection string
 APP_PASSWORD=...                 # the password for the login page
 HEALTH_SYNC_TOKEN=...            # the token the Apple Shortcut sends
+TIMEZONE=Europe/Ljubljana        # optional: your time zone, decides what "today" is
 ```
 
 Then:

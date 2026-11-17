@@ -1,7 +1,7 @@
 import { eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyEnergy, foodLog, weightLog } from "@/db/schema";
-import { currentMonthStartLjubljana, datesInCurrentMonthLjubljana, todayLjubljana } from "@/lib/date";
+import { currentMonthStartLocal, datesInCurrentMonthLocal, todayLocal } from "@/lib/date";
 import { WeightRow } from "@/components/WeightRow";
 import { logWeight } from "../actions";
 import { DECIMAL_PATTERN } from "@/lib/parseDecimal";
@@ -9,9 +9,9 @@ import { DECIMAL_PATTERN } from "@/lib/parseDecimal";
 export const dynamic = "force-dynamic";
 
 export default async function Weight() {
-  const today = todayLjubljana();
-  const monthStart = currentMonthStartLjubljana();
-  const dates = datesInCurrentMonthLjubljana(); // oldest first, this month only
+  const today = todayLocal();
+  const monthStart = currentMonthStartLocal();
+  const dates = datesInCurrentMonthLocal(); // oldest first, this month only
 
   const [todayWeightRows, energyRows, consumedRows, weightRows] = await Promise.all([
     db.select().from(weightLog).where(eq(weightLog.date, today)).limit(1),
