@@ -5,14 +5,13 @@ import screenshot from "@/docs/screenshot.png";
 import calendarShot from "@/docs/screens/calendar.png";
 import historyShot from "@/docs/screens/history.png";
 import weightShot from "@/docs/screens/weight.png";
+import { CheckIcon, GITHUB_URL, GitHubIcon, PrimaryButton } from "./ui";
 
 // Public landing page for people who want their own Fitapp. The proxy lets
 // everyone see it without the password. It has no database calls, so
 // Next.js builds it once as a static page.
 
-const GITHUB_URL = "https://github.com/karintomazic/Fitapp";
-// TODO: point this at the setup guide once it exists (step 3 of the plan).
-const SETUP_URL = GITHUB_URL;
+const SETUP_URL = "/welcome/setup";
 
 export const metadata: Metadata = {
   title: "Fitapp: see your real calorie deficit",
@@ -85,6 +84,7 @@ const PRIVACY = [
 
 const NEEDS = [
   "An iPhone and an Apple Watch",
+  "A free GitHub account (it keeps your copy of the code)",
   "A free Vercel account (it runs the app)",
   "A free Neon account (it stores your data)",
   "About 15 minutes",
@@ -355,19 +355,6 @@ export default function Welcome() {
   );
 }
 
-// mint-ink, not mint: white text on the lighter mint is too faint to read
-// easily. In dark mode mint-ink turns light, so the text turns dark.
-function PrimaryButton({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      className="flex items-center gap-2 rounded-full bg-mint-ink px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_-10px_var(--mint-ink)] hover:brightness-110 dark:text-background"
-    >
-      {children}
-    </a>
-  );
-}
-
 // The tilted phone with small glass cards floating around it. The cards are
 // examples of what the app shows, not live data (this page never reads the database).
 function HeroPhone() {
@@ -523,25 +510,6 @@ function SectionTitle({
   );
 }
 
-function CheckIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      fill="none"
-      stroke="var(--mint-ink)"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className="shrink-0"
-    >
-      <path d="M5 12.5l4.5 4.5L19 7.5" />
-    </svg>
-  );
-}
-
 function LockIcon() {
   return (
     <svg
@@ -557,14 +525,6 @@ function LockIcon() {
     >
       <rect x="4" y="10" width="16" height="11" rx="3" />
       <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
-
-function GitHubIcon() {
-  return (
-    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden>
-      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
     </svg>
   );
 }

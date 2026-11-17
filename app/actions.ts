@@ -15,7 +15,7 @@ import {
 import { PROFILE_ID } from "@/lib/goals";
 import { requireSession } from "@/lib/session";
 import { parseDecimal } from "@/lib/parseDecimal";
-import { todayLjubljana } from "@/lib/date";
+import { todayLocal } from "@/lib/date";
 import { macrosForGrams } from "@/lib/nutrition";
 
 export async function addFood(formData: FormData) {
@@ -80,7 +80,7 @@ export async function logFood(formData: FormData) {
   const macros = macrosForGrams(food, grams);
 
   await db.insert(foodLog).values({
-    date: todayLjubljana(),
+    date: todayLocal(),
     meal: meal as MealType,
     foodId: food.id,
     label: food.name,
@@ -124,7 +124,7 @@ export async function logWeight(formData: FormData) {
     return;
   }
 
-  const date = todayLjubljana();
+  const date = todayLocal();
   const [existing] = await db
     .select()
     .from(weightLog)

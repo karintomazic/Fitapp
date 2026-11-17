@@ -8,7 +8,7 @@ import {
   monthLabel,
   mondayOffset,
   shiftMonth,
-  todayLjubljana,
+  todayLocal,
 } from "@/lib/date";
 import { getProfile } from "@/lib/goals";
 import { round1 } from "@/lib/nutrition";
@@ -46,13 +46,13 @@ export default async function Calendar({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  const today = todayLjubljana();
+  const today = todayLocal();
   const currentMonth = today.slice(0, 7);
 
   // ?month=YYYY-MM picks the month (never past the current one);
   // ?day=YYYY-MM-DD picks the day shown under the grid.
   const monthParam = typeof params.month === "string" ? params.month : "";
-  
+
   // if ti has teh right shape and is not in the future
   const month =
     /^\d{4}-(0[1-9]|1[0-2])$/.test(monthParam) && monthParam <= currentMonth

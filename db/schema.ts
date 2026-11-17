@@ -11,7 +11,7 @@ import {
 
 // One row per day, upserted by the sync job.
 export const dailyEnergy = pgTable("daily_energy", {
-  date: date("date").primaryKey(), // local date, Europe/Ljubljana
+  date: date("date").primaryKey(), // local date, in the TIMEZONE setting
   activeKcal: integer("active_kcal"),
   basalKcal: integer("basal_kcal"),
   syncedAt: timestamp("synced_at", { withTimezone: true }),
@@ -19,7 +19,7 @@ export const dailyEnergy = pgTable("daily_energy", {
 
 // One row per day, manually logged — morning and/or evening weigh-in.
 export const weightLog = pgTable("weight_log", {
-  date: date("date").primaryKey(), // local date, Europe/Ljubljana
+  date: date("date").primaryKey(), // local date, in the TIMEZONE setting
   morningKg: real("morning_kg"),
   eveningKg: real("evening_kg"),
 });

@@ -2,9 +2,9 @@ import { and, asc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyEnergy, foodLog, foods, type MealType } from "@/db/schema";
 import {
-  currentWeekLjubljana,
-  todayLabelLjubljana,
-  todayLjubljana,
+  currentWeekLocal,
+  todayLabelLocal,
+  todayLocal,
 } from "@/lib/date";
 import { getProfile } from "@/lib/goals";
 import { round1 } from "@/lib/nutrition";
@@ -23,9 +23,9 @@ const MEALS: { meal: MealType; title: string }[] = [
 ];
 
 export default async function Home() {
-  const today = todayLjubljana();
-  const todayLabel = todayLabelLjubljana();
-  const week = currentWeekLjubljana();
+  const today = todayLocal();
+  const todayLabel = todayLabelLocal();
+  const week = currentWeekLocal();
 
   const [energyRows, entries, foodList, weekLogRows, profile] = await Promise.all([
     db.select().from(dailyEnergy).where(eq(dailyEnergy.date, today)).limit(1),
@@ -96,7 +96,7 @@ export default async function Home() {
             <p className="mt-0.5">
               <span className="font-display text-3xl font-semibold tabular-nums">
                 {consumedKcal.toLocaleString("en")}
-              </span>{" "}
+              </span>
               <span className="text-sm text-muted">
                 / {kcalGoal.toLocaleString("en")} kcal goal
               </span>

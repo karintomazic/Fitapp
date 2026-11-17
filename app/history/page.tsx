@@ -2,8 +2,8 @@ import { asc, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyEnergy, foodLog } from "@/db/schema";
 import {
-  currentMonthStartLjubljana,
-  datesInCurrentMonthLjubljana,
+  currentMonthStartLocal,
+  datesInCurrentMonthLocal,
   monthLabel,
 } from "@/lib/date";
 import { round1 } from "@/lib/nutrition";
@@ -13,8 +13,8 @@ import { MonthBlock } from "@/components/MonthBlock";
 export const dynamic = "force-dynamic";
 
 export default async function History() {
-  const monthStart = currentMonthStartLjubljana();
-  const dates = datesInCurrentMonthLjubljana(); // oldest first, this month only
+  const monthStart = currentMonthStartLocal();
+  const dates = datesInCurrentMonthLocal(); // oldest first, this month only
 
   const [energyRows, logRows, priorEnergyMonths, priorFoodMonths] =
     await Promise.all([

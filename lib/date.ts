@@ -1,4 +1,12 @@
-const TIME_ZONE = "Europe/Ljubljana";
+const TIME_ZONE = process.env.TIMEZONE || "Europe/Ljubljana";
+
+try {
+  new Intl.DateTimeFormat("en-US", { timeZone: TIME_ZONE });
+} catch {
+  throw new Error(
+    `TIMEZONE "${TIME_ZONE}" isn't a valid time zone. Use a name like "Europe/Ljubljana" or "America/New_York".`,
+  );
+}
 
 const dateFormatter = new Intl.DateTimeFormat("en-CA", {
   timeZone: TIME_ZONE,
@@ -20,13 +28,13 @@ const dayLabelFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-// YYYY-MM-DD in the local Slovenian date, regardless of server timezone.
-export function todayLjubljana(): string {
+// YYYY-MM-DD for today in TIME_ZONE, whatever time zone the server runs in.
+export function todayLocal(): string {
   return dateFormatter.format(new Date());
 }
 
-// Last n calendar dates (Ljubljana-local) ending today, oldest first.
-export function lastNDatesLjubljana(n: number): string[] {
+// Last n calendar dates (local) ending today, oldest first.
+export function lastNDatesLocal(n: number): string[] {
   const now = Date.now();
   const dates: string[] = [];
   for (let i = n - 1; i >= 0; i--) {
@@ -35,16 +43,16 @@ export function lastNDatesLjubljana(n: number): string[] {
   return dates;
 }
 
-// YYYY-MM-01 for the current Ljubljana-local month.
-export function currentMonthStartLjubljana(): string {
-  return `${todayLjubljana().slice(0, 7)}-01`;
+// YYYY-MM-01 for the current local-local month.
+export function currentMonthStartLocal(): string {
+  return `${todayLocal().slice(0, 7)}-01`;
 }
 
-// Every calendar date (Ljubljana-local) from the start of this month
+// Every calendar date (local-local) from the start of this month
 // through today, oldest first.
-export function datesInCurrentMonthLjubljana(): string[] {
-  const dayOfMonth = Number(todayLjubljana().slice(8, 10));
-  return lastNDatesLjubljana(dayOfMonth);
+export function datesInCurrentMonthLocal(): string[] {
+  const dayOfMonth = Number(todayLocal().slice(8, 10));
+  return lastNDatesLocal(dayOfMonth);
 }
 
 // "September 2026" for a "YYYY-MM" key.
@@ -52,8 +60,8 @@ export function monthLabel(monthKey: string): string {
   return monthFormatter.format(new Date(`${monthKey}-15T12:00:00Z`));
 }
 
-// "Thursday, September 17" for today, Ljubljana-local.
-export function todayLabelLjubljana(): string {
+// "Thursday, September 17" for today, local-local.
+export function todayLabelLocal(): string {
   return dayLabelFormatter.format(new Date());
 }
 
@@ -65,9 +73,9 @@ const shortDayFormatter = new Intl.DateTimeFormat("en-GB", {
 });
 
 // Monday to Sunday dates (YYYY-MM-DD) of the week that contains today,
-// Ljubljana-local.
-export function currentWeekLjubljana(): string[] {
-  const today = new Date(`${todayLjubljana()}T12:00:00Z`);
+// local-local.
+export function currentWeekLocal(): string[] {
+  const today = new Date(`${todayLocal()}T12:00:00Z`);
   const mondayOffset = (today.getUTCDay() + 6) % 7;
   return Array.from({ length: 7 }, (_, i) =>
     new Date(today.getTime() + (i - mondayOffset) * 24 * 60 * 60 * 1000)
