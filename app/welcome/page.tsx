@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import screenshot from "@/docs/screenshot.png";
+import calendarShot from "@/docs/screens/calendar.png";
+import historyShot from "@/docs/screens/history.png";
+import weightShot from "@/docs/screens/weight.png";
 
 // Public landing page for people who want their own Fitapp. The proxy lets
 // everyone see it without the password. It has no database calls, so
@@ -45,17 +48,17 @@ const SCREENS: { title: string; text: string; image: StaticImageData | null }[] 
   {
     title: "Calendar",
     text: "Tap any day to see what you ate and burned.",
-    image: null,
+    image: calendarShot,
   },
   {
     title: "History",
-    text: "Month-by-month totals, so you follow the trend, not one day.",
-    image: null,
+    text: "Every meal of the month, plus month-by-month totals.",
+    image: historyShot,
   },
   {
     title: "Weight",
     text: "Morning and evening weigh-ins, side by side.",
-    image: null,
+    image: weightShot,
   },
 ];
 
