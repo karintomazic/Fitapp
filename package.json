@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run db:migrate:deploy && next build",
+    "db:migrate:deploy": "if [ \"$VERCEL_ENV\" = production ]; then drizzle-kit migrate; else echo 'Skipping migrations: not a Vercel production build'; fi",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",

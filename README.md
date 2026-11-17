@@ -62,3 +62,6 @@ npm install
 npm run db:migrate   # create the database tables
 npm run dev          # http://localhost:3000
 ```
+
+On Vercel you don't need to run `db:migrate` yourself. Every production deploy runs
+any new migrations before it builds, and skips the ones that already ran.
