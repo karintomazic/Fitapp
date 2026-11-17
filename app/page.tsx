@@ -96,7 +96,7 @@ export default async function Home() {
             <p className="mt-0.5">
               <span className="font-display text-3xl font-semibold tabular-nums">
                 {consumedKcal.toLocaleString("en")}
-              </span>{" "}
+              </span>
               <span className="text-sm text-muted">
                 / {kcalGoal.toLocaleString("en")} kcal goal
               </span>

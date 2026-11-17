@@ -156,10 +156,10 @@ export default async function Settings({
             />
           </div>
           <p className="mt-3 text-xs text-muted">
-            Your saved macros add up to{" "}
+            Your saved macros add up to
             <span className="font-semibold text-foreground">
               {macroKcal.toLocaleString("en")} kcal
-            </span>{" "}
+            </span>
             a day.
           </p>
         </section>
