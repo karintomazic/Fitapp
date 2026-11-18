@@ -75,6 +75,7 @@ export function TimeZoneHint() {
   if (!zone) return null;
   return (
     <>
+      {" "}
       Yours looks like <code className="font-mono font-semibold">{zone}</code>.
     </>
   );

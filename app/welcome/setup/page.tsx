@@ -8,8 +8,7 @@ import { SyncKeyGenerator, TimeZoneHint } from "./SetupTools";
 // /welcome (the proxy skips everything under /welcome), and static.
 
 // The iCloud link to the shared Apple Shortcut, without anyone's address or key.
-// TODO: paste the link here once the Shortcut is shared from the iPhone.
-const SHORTCUT_URL = "";
+const SHORTCUT_URL = "https://www.icloud.com/shortcuts/fd51199cae5f4491acd68694994e79c8";
 
 // Vercel's "clone" link: it copies the repo into the visitor's GitHub account
 // and asks for these settings before the first deploy.
@@ -57,6 +56,18 @@ const TROUBLE = [
   {
     q: "The Shortcut says “Unauthorized”",
     a: "The sync key in the Shortcut doesn't match HEALTH_SYNC_TOKEN in Vercel. Check for a missing character or an extra space. If you change it in Vercel, redeploy (see below).",
+  },
+  {
+    q: "The Shortcut says it's “trying to share … Health items, which is not allowed”",
+    a: "Turn on Settings → Apps → Shortcuts → Advanced → Allow Sharing Large Amounts of Data (step 5). Fitapp only receives the daily totals, but iOS counts every Health record they're added up from.",
+  },
+  {
+    q: "The Shortcut never finishes",
+    a: "Check your Fitapp address in the Shortcut. It must end in .vercel.app, with no space, slash or page name like /history after it.",
+  },
+  {
+    q: "Switching pages is slow",
+    a: "Your app runs far from your database. In Vercel, open your project's Settings → Functions and pick the region closest to the one you chose in Neon (for example Frankfurt for eu-central-1), then redeploy.",
   },
   {
     q: "Burned calories show 0",
@@ -182,7 +193,11 @@ export default function Setup() {
         </Step>
 
         <Step n={5} id="shortcut" title="Add the Apple Shortcut">
-          <p>The Shortcut reads today&apos;s calories from Apple Health and sends them to your Fitapp.</p>
+          <p>
+            The Shortcut reads the calories you burned today and yesterday from Apple Health and
+            sends them to your Fitapp. Sending yesterday again fills in the last minutes of the
+            day, and catches up if a night was missed.
+          </p>
           {SHORTCUT_URL ? (
             <div className="self-start">
               <PrimaryButton href={SHORTCUT_URL}>Get the Shortcut</PrimaryButton>
@@ -197,15 +212,23 @@ export default function Setup() {
               Open the link on your iPhone and tap <b>Add Shortcut</b>.
             </li>
             <li>
-              It asks two questions: your Fitapp address (like
-              <code className="font-mono">https://fitapp-yourname.vercel.app</code>) and your sync
-              key.
+              It asks two questions: your Fitapp address (like{" "}
+              <code className="font-mono">https://fitapp-yourname.vercel.app</code>, with nothing
+              after <code className="font-mono">.app</code>) and your sync key.
             </li>
             <li>
-              Open the Shortcuts app and tap <b>Fitapp Sync</b> once. Allow access to Health when
-              it asks.
+              In iPhone <b>Settings</b>, go to <b>Apps → Shortcuts → Advanced</b> and turn on{" "}
+              <b>Allow Sharing Large Amounts of Data</b>. A full day has hundreds of Health
+              records, and iOS blocks the sync without this. Fitapp still only receives the totals.
             </li>
-            <li>Open Fitapp. Your burned calories for today should be there.</li>
+            <li>
+              Open the Shortcuts app and tap <b>Fitapp Sync</b> once. When it asks for Health
+              access, allow <b>Active Energy</b> and <b>Resting Energy</b>.
+            </li>
+            <li>
+              It shows <code className="font-mono">{`{"ok":true}`}</code>. Open Fitapp, and your
+              burned calories for today are there.
+            </li>
           </List>
         </Step>
 
@@ -216,7 +239,8 @@ export default function Setup() {
               In the Shortcuts app, open <b>Automation</b> and tap <b>+</b>.
             </li>
             <li>
-              Choose <b>Time of Day</b>, set it to <b>23:00</b> and <b>Daily</b>.
+              Choose <b>Time of Day</b>, set it to <b>23:55</b> and <b>Daily</b>. That late, it
+              catches almost the whole day.
             </li>
             <li>
               Choose <b>Run Immediately</b>, so it doesn&apos;t ask you first.
