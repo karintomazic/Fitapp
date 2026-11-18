@@ -8,8 +8,7 @@ import { SyncKeyGenerator, TimeZoneHint } from "./SetupTools";
 // /welcome (the proxy skips everything under /welcome), and static.
 
 // The iCloud link to the shared Apple Shortcut, without anyone's address or key.
-// TODO: paste the link here once the Shortcut is shared from the iPhone.
-const SHORTCUT_URL = "";
+const SHORTCUT_URL = "https://www.icloud.com/shortcuts/fd51199cae5f4491acd68694994e79c8";
 
 // Vercel's "clone" link: it copies the repo into the visitor's GitHub account
 // and asks for these settings before the first deploy.
