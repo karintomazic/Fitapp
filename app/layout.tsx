@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { THEME_COLORS, THEME_INIT_SCRIPT } from "@/lib/theme";
 import { Nav } from "@/components/Nav";
+import { RefreshOnReturn } from "@/components/RefreshOnReturn";
 import "./globals.css";
 
 const inter = Inter({
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <Nav />
+        <RefreshOnReturn version={process.env.VERCEL_GIT_COMMIT_SHA ?? "dev"} />
       </body>
     </html>
   );
