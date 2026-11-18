@@ -42,3 +42,8 @@ next-env.d.ts
 
 # neon
 .neon
+
+# AI assistant files
+CLAUDE.md
+.agents/
+skills-lock.json
