@@ -4,7 +4,7 @@ A personal calorie and macro tracker that I built for myself and use every day o
 At a glance it shows how many calories I've burned today (from my Apple Watch), how many I've
 eaten, and the difference.
 
-**Live:** [fitapp-sepia-pi.vercel.app](https://fitapp-sepia-pi.vercel.app/) (password protected, since it holds my personal data)
+**Live:** [fitapp-sepia-pi.vercel.app/welcome](https://fitapp-sepia-pi.vercel.app/welcome). My own app is password protected, since it holds my personal data, but anyone can get their own free copy with the [setup guide](https://fitapp-sepia-pi.vercel.app/welcome/setup).
 
 <img src="docs/screenshot.png" alt="Fitapp home screen showing calories eaten against the daily goal, a week strip, and carbs, protein and fat rings" width="320">
 
@@ -16,7 +16,22 @@ eaten, and the difference.
 - **Weight log** with morning and evening weigh-ins
 - **Settings** for profile and daily goals
 - Light and dark mode
-- Installable on the phone's home screen as a PWA
+- Installable on the phone's home screen as a PWA, and it refreshes itself when reopened
+- **A public landing page and setup guide** so other people can run their own copy
+
+## Get your own
+
+Every person gets their own copy instead of an account on mine, so nobody's health data
+sits on someone else's server. The [setup guide](https://fitapp-sepia-pi.vercel.app/welcome/setup)
+walks through it in about 15 minutes, with no coding:
+
+1. A free Neon database
+2. A sync key, made in the browser so it's never sent anywhere
+3. A **Deploy to Vercel** button that copies the repo and asks for the settings
+4. A shared Apple Shortcut that asks for your address and key when you add it
+5. A daily automation that sends today and yesterday at 23:55
+
+Database migrations run on every production deploy, so a fresh copy sets itself up.
 
 ## Tech stack
 
